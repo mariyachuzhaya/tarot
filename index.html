@@ -204,6 +204,9 @@ input,select,textarea{font-family:var(--body)}
 .seg{border:1px solid var(--line);background:var(--panel);color:var(--ink-soft);padding:9px 18px;font-size:13px;border-radius:999px;transition:all .15s}
 .seg:hover{border-color:var(--ink-soft);color:var(--ink)}
 .seg.on{background:var(--teal);border-color:var(--teal);color:#F2ECDC}
+.src-note{font-size:12.5px;color:var(--ink-soft);margin:-6px 0 16px;line-height:1.45;max-width:60ch}
+.src-intro{font-size:13px;color:var(--ink-soft);margin:0 0 12px;line-height:1.5;max-width:64ch}
+.src-intro b{color:var(--ink);font-weight:600}
 .btn{
   border:1px solid var(--teal);background:var(--teal);color:#fff;
   padding:11px 20px;border-radius:10px;font-size:13.5px;letter-spacing:.4px;
@@ -737,9 +740,10 @@ function renderStage(){
         <button class="btn ghost" onclick="clearDraws()">Очистить</button>
       </div>
       ${state.manual?`<div class="section-label">Карты по позициям</div>${renderInputs()}`:''}
+      <div class="section-label">Толкование</div>
+      <div class="src-intro"><b>AI-таролог</b> связывает карты под твой вопрос, нужен интернет. <b>Из справочника</b> даёт готовые значения и работает без интернета, выбирай его, если связь плохая.</div>
       <div class="src-toggle">
-        <span class="src-label">Толкование</span>
-        <button class="seg ${state.source==='ai'?'on':''}" onclick="setSource('ai')">ИИ</button>
+        <button class="seg ${state.source==='ai'?'on':''}" onclick="setSource('ai')">AI-таролог</button>
         <button class="seg ${state.source==='book'?'on':''}" onclick="setSource('book')">Из справочника</button>
       </div>
       <div class="draw-bar">
