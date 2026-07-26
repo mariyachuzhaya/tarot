@@ -739,7 +739,7 @@ function renderFoot(){
   if(state.mode==="read"){
     f.innerHTML=`Толкование пишет ИИ по системе Райдер-Уэйт-Смит. Внутри Claude всё работает сразу. Для публикации на своём сайте в вызов <code>api.anthropic.com</code> нужен твой ключ или прокси.`;
   }else if(state.mode==="cabinet"){
-    f.innerHTML=`История хранится в памяти сессии: после перезагрузки страницы очищается. На твоём хостинге можно подключить постоянное хранилище, добавим отдельно.`;
+    f.innerHTML=`История сохраняется прямо в этом браузере на твоём устройстве и остаётся после перезагрузки. Другие устройства и режим инкогнито её не видят. Чтобы удалить запись, нажми «Удалить».`;
   }else{
     f.innerHTML=`Шесть раскладов. Переключись в «Сделать расклад», чтобы вытянуть карты и получить разбор от ИИ.`;
   }
@@ -892,6 +892,19 @@ async function getReading(){
   if(out)out.innerHTML=renderReadingOut();
 }
 
+/* ---------- persistence (localStorage, безопасно) ---------- */
+function persist(){
+  try{localStorage.setItem("tarot_store_v1",JSON.stringify({history:state.history,readerName:state.readerName}));}catch(e){}
+}
+function restore(){
+  try{
+    const raw=localStorage.getItem("tarot_store_v1");
+    if(raw){const d=JSON.parse(raw);
+      if(Array.isArray(d.history))state.history=d.history;
+      if(typeof d.readerName==="string")state.readerName=d.readerName;}
+  }catch(e){}
+}
+
 /* ---------- cabinet & history ---------- */
 function resolvePositions(spr,draws,reading){
   const map=(reading&&reading.map)||{};
@@ -917,11 +930,13 @@ function recordFromState(){
 function saveReading(){
   if(!state.reading){return}
   state.history.unshift(recordFromState());
+  persist();
   const btns=document.querySelectorAll(".save-bar .btn");
   if(btns[0]){btns[0].textContent="Сохранено ✓";setTimeout(()=>{if(btns[0])btns[0].textContent="Сохранить в историю"},1600)}
 }
 function deleteRecord(id){
   state.history=state.history.filter(r=>r.id!==id);
+  persist();
   renderStage();
 }
 function renderCabinet(){
@@ -944,7 +959,7 @@ function renderCabinet(){
     <p class="lede">Сохранённые расклады этой сессии. Открой любой, чтобы показать клиенту или выгрузить.</p>
     <div class="cab-settings">
       <label>Имя таролога</label>
-      <input type="text" placeholder="как подписать лист клиента" value="${(state.readerName||'').replace(/"/g,'&quot;')}" onchange="state.readerName=this.value">
+      <input type="text" placeholder="как подписать лист клиента" value="${(state.readerName||'').replace(/"/g,'&quot;')}" onchange="state.readerName=this.value;persist()">
     </div>
     <div class="section-label">История · ${state.history.length} ${cardWord(state.history.length).replace('карт','расклад').replace('карта','расклад').replace('карты','расклада')}</div>
     ${list}`;
@@ -1088,6 +1103,7 @@ function reopenSheet(){
 
 /* ---------- init ---------- */
 document.getElementById("deck").innerHTML=DECK.map(c=>`<option value="${c}">`).join("");
+restore();
 renderAll();
 </script>
 </body>
