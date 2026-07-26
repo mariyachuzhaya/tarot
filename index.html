@@ -312,11 +312,30 @@ input,select,textarea{font-family:var(--body)}
   .rail{border-right:0;border-bottom:1px solid var(--line);display:flex;gap:8px;overflow-x:auto;padding:12px}
   .rail .eyebrow{display:none}
   .spread-item{min-width:180px;margin:0}
-  .stage{padding:20px 18px 50px}
-  .stage h2{font-size:30px}
+  .stage{padding:20px 16px 50px}
+  .stage h2{font-size:28px}
   .legend{grid-template-columns:1fr}
   .inputs{grid-template-columns:1fr}
-  .board{min-height:340px}
+  .masthead{padding:18px 18px 16px}
+  .hero{padding:46px 18px 42px}
+  .hero-point{min-width:100%}
+  .modal{padding:14px 8px}
+  .sheet{padding:24px 20px 22px}
+  .modes button{padding:9px 15px;font-size:12.5px}
+}
+@media(max-width:520px){
+  .brand h1{font-size:26px}
+  .stage h2{font-size:24px}
+  .board .slot{width:15.5%;min-width:44px}
+  .slot .pos-caption{display:none}
+  .board{border-radius:12px}
+  .in-row{flex-wrap:wrap;gap:6px 8px;padding:8px 0}
+  .in-row .in-lbl{width:auto;flex:1 1 100%;order:-1;white-space:normal}
+  .in-row input[type=text]{flex:1 1 120px}
+  .draw-bar .btn{flex:1 1 100%}
+  .draw-bar .hint{flex:1 1 100%}
+  .sheet .sh-thumb{width:56px}
+  .sheet{padding:20px 16px}
 }
 </style>
 </head>
