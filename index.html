@@ -575,7 +575,7 @@ const MEANINGS={
    например: "https://tarot-proxy.твойлогин.workers.dev" */
 const PROXY_URL="https://tarot-proxy.mcresearchuz.workers.dev";
 
-let state={mode:"learn",spreadId:"partner",draws:{},question:"",context:"Отношения",busy:false,reading:null,error:null,history:[],clientName:"",readerName:"",source:"ai",notice:""};
+let state={mode:"learn",spreadId:"partner",draws:{},question:"",context:"Отношения",busy:false,reading:null,error:null,history:[],clientName:"",readerName:"",source:"ai",notice:"",manual:false};
 
 /* ---------- render ---------- */
 function spread(){return SPREADS.find(s=>s.id===state.spreadId)}
@@ -699,9 +699,7 @@ function renderStage(){
   }else{
     st.innerHTML=`
       <h2>${s.name}</h2>
-      <p class="lede">Впиши свои карты или вытяни случайные, задай вопрос и получи толкование.</p>
-      <div class="section-label">Схема</div>
-      ${renderBoard()}
+      <p class="lede">Начни с вопроса и сферы, затем впиши свои карты или вытяни случайные и получи толкование.</p>
       <div class="ask">
         <label>Вопрос или ситуация</label>
         <textarea id="q" placeholder="О чём спрашиваешь? Чем конкретнее, тем точнее разбор." onchange="state.question=this.value">${state.question}</textarea>
@@ -716,11 +714,10 @@ function renderStage(){
       </div>
       <div class="draw-bar">
         <button class="btn gold" onclick="drawAll()">Вытянуть все случайно</button>
+        <button class="btn ghost" onclick="toggleManual()">${state.manual?'Скрыть ручной ввод':'Ввести вручную'}</button>
         <button class="btn ghost" onclick="clearDraws()">Очистить</button>
-        <span class="hint">или впиши карты вручную ниже</span>
       </div>
-      <div class="section-label">Карты по позициям</div>
-      ${renderInputs()}
+      ${state.manual?`<div class="section-label">Карты по позициям</div>${renderInputs()}`:''}
       <div class="src-toggle">
         <span class="src-label">Толкование</span>
         <button class="seg ${state.source==='ai'?'on':''}" onclick="setSource('ai')">ИИ</button>
@@ -728,8 +725,10 @@ function renderStage(){
       </div>
       <div class="draw-bar">
         <button class="btn" id="readBtn" onclick="getReadingDispatch()" ${allFilled()?'':'disabled'}>Получить толкование</button>
-        <span class="hint">${allFilled()?(state.source==='book'?'значения из встроенного справочника, работает офлайн':'все позиции заполнены'):'заполни все позиции, чтобы получить разбор'}</span>
+        <span class="hint">${allFilled()?(state.source==='book'?'значения из встроенного справочника, работает офлайн':'карты на месте, можно смотреть разбор'):'вытяни карты или впиши их вручную'}</span>
       </div>
+      <div class="section-label">Схема</div>
+      ${renderBoard()}
       <div id="readingOut">${renderReadingOut()}</div>`;
   }
 }
@@ -795,6 +794,7 @@ function refreshBoard(){
 
 /* ---------- источник толкования ---------- */
 function setSource(s){state.source=s;renderStage();}
+function toggleManual(){state.manual=!state.manual;renderStage();}
 function getReadingDispatch(){
   if(!allFilled())return;
   state.notice="";
