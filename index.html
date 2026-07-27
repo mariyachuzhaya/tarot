@@ -487,9 +487,7 @@ function md5(str){
 }
 function cardImg(name,w){
   const f=CARD_FILE[(name||"").trim()];
-  if(!f)return"";
-  const file=f+".jpg";const h=md5(file);
-  return `https://upload.wikimedia.org/wikipedia/commons/thumb/${h[0]}/${h.slice(0,2)}/${file}/${w||320}px-${file}`;
+  return f?`cards/${f}.jpg`:"";
 }
 // Ячейка карты: снизу рисованный вектор, сверху настоящий скан.
 // Если скана нет (нет сети, не загрузился), остаётся вектор.
