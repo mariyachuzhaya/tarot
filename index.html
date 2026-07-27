@@ -165,6 +165,9 @@ input,select,textarea{font-family:var(--body)}
   box-shadow:0 3px 7px var(--shadow);
 }
 .card-face .cf-name{font-family:var(--disp);font-size:13px;line-height:1.05;color:var(--ink)}
+.cardcell{position:relative;width:100%;height:100%;line-height:0}
+.cardcell>svg{display:block;width:100%;height:100%}
+.cardcell-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit}
 .card-face .cf-rev{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-top:4px}
 .card-face.reversed{background:#F3ECDF}
 .card-face .pos-badge{
@@ -439,6 +442,63 @@ function cardSVG(name){
   return open+body+`</svg>`;
 }
 
+/* ---------- реальные сканы Райдер-Уэйта (Викисклад, общественное достояние) ---------- */
+const MAJOR_FILES=["RWS_Tarot_00_Fool","RWS_Tarot_01_Magician","RWS_Tarot_02_High_Priestess","RWS_Tarot_03_Empress","RWS_Tarot_04_Emperor","RWS_Tarot_05_Hierophant","RWS_Tarot_06_Lovers","RWS_Tarot_07_Chariot","RWS_Tarot_08_Strength","RWS_Tarot_09_Hermit","RWS_Tarot_10_Wheel_of_Fortune","RWS_Tarot_11_Justice","RWS_Tarot_12_Hanged_Man","RWS_Tarot_13_Death","RWS_Tarot_14_Temperance","RWS_Tarot_15_Devil","RWS_Tarot_16_Tower","RWS_Tarot_17_Star","RWS_Tarot_18_Moon","RWS_Tarot_19_Sun","RWS_Tarot_20_Judgement","RWS_Tarot_21_World"];
+const SUIT_FILE={"Жезлов":"Wands","Кубков":"Cups","Мечей":"Swords","Пентаклей":"Pents"};
+const CARD_FILE={};
+MAJORS.forEach((n,i)=>{CARD_FILE[n]=MAJOR_FILES[i]});
+SUITS.forEach(s=>RANKS.forEach((r,i)=>{CARD_FILE[r+" "+s]=SUIT_FILE[s]+String(i+1).padStart(2,"0")}));
+function md5(str){
+  function rl(n,c){return (n<<c)|(n>>>(32-c));}
+  function au(x,y){var l=(x&0xFFFF)+(y&0xFFFF);return (((x>>16)+(y>>16)+(l>>16))<<16)|(l&0xFFFF);}
+  function cm(q,a,b,x,s,t){return au(rl(au(au(a,q),au(x,t)),s),b);}
+  function ff(a,b,c,d,x,s,t){return cm((b&c)|((~b)&d),a,b,x,s,t);}
+  function gg(a,b,c,d,x,s,t){return cm((b&d)|(c&(~d)),a,b,x,s,t);}
+  function hh(a,b,c,d,x,s,t){return cm(b^c^d,a,b,x,s,t);}
+  function ii(a,b,c,d,x,s,t){return cm(c^(b|(~d)),a,b,x,s,t);}
+  var bytes=[];
+  for(var i=0;i<str.length;i++){var c=str.charCodeAt(i);
+    if(c<128)bytes.push(c);else if(c<2048)bytes.push(192|(c>>6),128|(c&63));
+    else bytes.push(224|(c>>12),128|((c>>6)&63),128|(c&63));}
+  var nb=bytes.length,x=[];
+  for(i=0;i<nb;i++)x[i>>2]=(x[i>>2]||0)|(bytes[i]<<((i%4)*8));
+  x[nb>>2]=(x[nb>>2]||0)|(0x80<<((nb%4)*8));
+  var L=(((nb+8)>>6)+1)*16;while(x.length<L)x.push(0);x[L-2]=nb*8;
+  var a=1732584193,b=-271733879,c=-1732584194,d=271733878;
+  for(i=0;i<x.length;i+=16){var oa=a,ob=b,oc=c,od=d;
+    a=ff(a,b,c,d,x[i],7,-680876936);d=ff(d,a,b,c,x[i+1],12,-389564586);c=ff(c,d,a,b,x[i+2],17,606105819);b=ff(b,c,d,a,x[i+3],22,-1044525330);
+    a=ff(a,b,c,d,x[i+4],7,-176418897);d=ff(d,a,b,c,x[i+5],12,1200080426);c=ff(c,d,a,b,x[i+6],17,-1473231341);b=ff(b,c,d,a,x[i+7],22,-45705983);
+    a=ff(a,b,c,d,x[i+8],7,1770035416);d=ff(d,a,b,c,x[i+9],12,-1958414417);c=ff(c,d,a,b,x[i+10],17,-42063);b=ff(b,c,d,a,x[i+11],22,-1990404162);
+    a=ff(a,b,c,d,x[i+12],7,1804603682);d=ff(d,a,b,c,x[i+13],12,-40341101);c=ff(c,d,a,b,x[i+14],17,-1502002290);b=ff(b,c,d,a,x[i+15],22,1236535329);
+    a=gg(a,b,c,d,x[i+1],5,-165796510);d=gg(d,a,b,c,x[i+6],9,-1069501632);c=gg(c,d,a,b,x[i+11],14,643717713);b=gg(b,c,d,a,x[i],20,-373897302);
+    a=gg(a,b,c,d,x[i+5],5,-701558691);d=gg(d,a,b,c,x[i+10],9,38016083);c=gg(c,d,a,b,x[i+15],14,-660478335);b=gg(b,c,d,a,x[i+4],20,-405537848);
+    a=gg(a,b,c,d,x[i+9],5,568446438);d=gg(d,a,b,c,x[i+14],9,-1019803690);c=gg(c,d,a,b,x[i+3],14,-187363961);b=gg(b,c,d,a,x[i+8],20,1163531501);
+    a=gg(a,b,c,d,x[i+13],5,-1444681467);d=gg(d,a,b,c,x[i+2],9,-51403784);c=gg(c,d,a,b,x[i+7],14,1735328473);b=gg(b,c,d,a,x[i+12],20,-1926607734);
+    a=hh(a,b,c,d,x[i+5],4,-378558);d=hh(d,a,b,c,x[i+8],11,-2022574463);c=hh(c,d,a,b,x[i+11],16,1839030562);b=hh(b,c,d,a,x[i+14],23,-35309556);
+    a=hh(a,b,c,d,x[i+1],4,-1530992060);d=hh(d,a,b,c,x[i+4],11,1272893353);c=hh(c,d,a,b,x[i+7],16,-155497632);b=hh(b,c,d,a,x[i+10],23,-1094730640);
+    a=hh(a,b,c,d,x[i+13],4,681279174);d=hh(d,a,b,c,x[i],11,-358537222);c=hh(c,d,a,b,x[i+3],16,-722521979);b=hh(b,c,d,a,x[i+6],23,76029189);
+    a=hh(a,b,c,d,x[i+9],4,-640364487);d=hh(d,a,b,c,x[i+12],11,-421815835);c=hh(c,d,a,b,x[i+15],16,530742520);b=hh(b,c,d,a,x[i+2],23,-995338651);
+    a=ii(a,b,c,d,x[i],6,-198630844);d=ii(d,a,b,c,x[i+7],10,1126891415);c=ii(c,d,a,b,x[i+14],15,-1416354905);b=ii(b,c,d,a,x[i+5],21,-57434055);
+    a=ii(a,b,c,d,x[i+12],6,1700485571);d=ii(d,a,b,c,x[i+3],10,-1894986606);c=ii(c,d,a,b,x[i+10],15,-1051523);b=ii(b,c,d,a,x[i+1],21,-2054922799);
+    a=ii(a,b,c,d,x[i+8],6,1873313359);d=ii(d,a,b,c,x[i+15],10,-30611744);c=ii(c,d,a,b,x[i+6],15,-1560198380);b=ii(b,c,d,a,x[i+13],21,1309151649);
+    a=ii(a,b,c,d,x[i+4],6,-145523070);d=ii(d,a,b,c,x[i+11],10,-1120210379);c=ii(c,d,a,b,x[i+2],15,718787259);b=ii(b,c,d,a,x[i+9],21,-343485551);
+    a=au(a,oa);b=au(b,ob);c=au(c,oc);d=au(d,od);}
+  function hex(n){var s="";for(var j=0;j<4;j++)s+=("0"+((n>>(j*8))&255).toString(16)).slice(-2);return s;}
+  return hex(a)+hex(b)+hex(c)+hex(d);
+}
+function cardImg(name,w){
+  const f=CARD_FILE[(name||"").trim()];
+  if(!f)return"";
+  const file=f+".jpg";const h=md5(file);
+  return `https://upload.wikimedia.org/wikipedia/commons/thumb/${h[0]}/${h.slice(0,2)}/${file}/${w||320}px-${file}`;
+}
+// Ячейка карты: снизу рисованный вектор, сверху настоящий скан.
+// Если скана нет (нет сети, не загрузился), остаётся вектор.
+function cardCell(name,w){
+  const url=cardImg(name,w||320);
+  return `<div class="cardcell">${cardSVG(name)}${url?`<img class="cardcell-img" src="${url}" alt="${name}" loading="lazy" crossorigin="anonymous" onerror="this.remove()">`:''}</div>`;
+}
+
 /* ---------- spreads ---------- */
 const SPREADS=[
  {id:"partner",name:"Партнёрский",tagline:"Отношения: что между вами и чего ждать",
@@ -629,7 +689,7 @@ function renderBoard(){
     if(d&&d.card){
       inner=`<div class="card-face" style="padding:0;overflow:hidden;${d.reversed?'transform:rotate(180deg)':''}">
         <div class="pos-badge" style="${d.reversed?'transform:rotate(180deg)':''}">${sl.label}</div>
-        ${cardSVG(d.card)}
+        ${cardCell(d.card,240)}
         <span class="cf-name" style="position:absolute;bottom:2px;left:2px;right:2px;background:rgba(247,241,226,.85);border-radius:2px;font-size:9px;padding:1px 2px">${d.card}</span>
       </div>`;
     }else{
@@ -687,7 +747,7 @@ function renderReadingOut(){
     const txt=map[String(sl.label)]||"";
     if(!d.card&&!txt)return"";
     return `<div class="r-block">
-      ${d.card?`<div class="r-thumb ${d.reversed?'rev':''}">${cardSVG(d.card)}</div>`:''}
+      ${d.card?`<div class="r-thumb ${d.reversed?'rev':''}">${cardCell(d.card,180)}</div>`:''}
       <div class="r-body">
         <div class="r-head"><span class="r-n">${sl.label}</span><span class="r-pos">${sl.title||''}</span></div>
         <div class="r-card">${d.card||''}${d.reversed?' · перевёрнутая':''}</div>
@@ -994,7 +1054,7 @@ function buildSheet(r){
   const positions=(r.positions||[]).map(p=>{
     return `
     <div class="sh-pos">
-      ${p.card?`<div class="sh-thumb ${p.reversed?'rev':''}">${cardSVG(p.card)}</div>`:''}
+      ${p.card?`<div class="sh-thumb ${p.reversed?'rev':''}">${cardCell(p.card,200)}</div>`:''}
       <div class="sh-body">
         <div class="sh-ph"><span class="sh-pn">${p.n}</span><span class="sh-pt">${p.title}</span></div>
         <div class="sh-pc">${p.card}${p.reversed?" · перевёрнутая":""}</div>
