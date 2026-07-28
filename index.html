@@ -178,17 +178,16 @@ body::after{
 .slot.clickable:hover{transform:translate(-50%,-50%) translateY(-3px)}
 .slot.sig .card-face,.slot.sig .card-back{border-style:dashed}
 .card-back{
-  width:100%;height:100%;border:1.5px solid var(--gold);border-radius:4px;
-  background:
-    repeating-linear-gradient(45deg,rgba(195,149,49,.10) 0 6px,transparent 6px 12px),
-    #F3ECDA;
-  display:flex;align-items:center;justify-content:center;position:relative;
-  box-shadow:0 2px 5px var(--shadow);
+  width:100%;height:100%;border-radius:8px;overflow:hidden;position:relative;
+  background:linear-gradient(155deg,#7A66A0 0%,#544277 55%,#3E3060 100%);
+  border:1px solid rgba(230,201,122,.35);
+  box-shadow:inset 0 0 18px rgba(0,0,0,.20), 0 4px 12px var(--shadow);
+  display:flex;align-items:center;justify-content:center;
 }
-.card-back svg{width:56%;height:56%;opacity:.65}
+.card-back svg{width:100%;height:100%;opacity:1;display:block}
 .card-back .pos-badge{
   position:absolute;top:-9px;left:-9px;width:22px;height:22px;border-radius:50%;
-  background:var(--teal);color:#FFFFFF;font-size:11px;font-weight:600;
+  background:var(--gold);color:#3A2E12;font-size:11px;font-weight:600;
   display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px var(--shadow);
 }
 .card-face{
@@ -201,6 +200,16 @@ body::after{
 .cardcell{position:relative;width:100%;height:100%;line-height:0}
 .cardcell>svg{display:block;width:100%;height:100%}
 .cardcell-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.card-empty{width:100%;height:100%;border:2px dashed rgba(182,163,216,.75);border-radius:10px;background:rgba(182,163,216,.06);position:relative}
+.card-empty.next{border-color:var(--gold);background:rgba(216,169,78,.10);box-shadow:0 0 0 4px rgba(216,169,78,.08)}
+.card-empty .pos-badge{position:absolute;top:-9px;left:-9px;width:22px;height:22px;border-radius:50%;background:var(--plum);color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px var(--shadow)}
+.card-empty.next .pos-badge{background:var(--gold);color:#3A2E12}
+.card-face{perspective:640px}
+@keyframes cardflip{from{transform:rotateY(82deg) scale(.96);opacity:.12}to{transform:none;opacity:1}}
+.cardcell.flip{animation:cardflip .5s cubic-bezier(.2,.7,.2,1) both;transform-origin:center}
+.hero-fan{position:relative;height:90px;margin-top:54px;display:flex;justify-content:center;align-items:flex-end}
+.hero-fan .fcard{position:absolute;bottom:-34px;width:74px;height:116px;border-radius:13px;overflow:hidden;background:linear-gradient(155deg,#7A66A0,#3E3060);border:1px solid rgba(230,201,122,.4);box-shadow:0 14px 32px rgba(110,90,138,.35);transform-origin:bottom center}
+.hero-fan .fcard svg{width:100%;height:100%;display:block}
 .card-face .cf-rev{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-top:4px}
 .card-face.reversed{background:#F3ECDF}
 .card-face .pos-badge{
@@ -441,6 +450,7 @@ body::after{
     <div class="hero-point"><div class="hp-t">Ракурсы</div><div class="hp-d">Каждая позиция это отдельный вопрос: что помогает, что мешает, к чему всё идёт.</div></div>
     <div class="hero-point"><div class="hp-t">Ясность</div><div class="hp-d">На выходе не гадание, а понятный разбор и конкретный следующий шаг.</div></div>
   </div>
+  <div class="hero-fan" id="heroFan" aria-hidden="true"></div>
 </section>
 
 <div class="wrap">
@@ -556,9 +566,10 @@ function cardImg(name,w){
 }
 // Ячейка карты: снизу рисованный вектор, сверху настоящий скан.
 // Если скана нет (нет сети, не загрузился), остаётся вектор.
-function cardCell(name,w){
+function cardCell(name,w,cls,delay){
   const url=cardImg(name,w||320);
-  return `<div class="cardcell">${cardSVG(name)}${url?`<img class="cardcell-img" src="${url}" alt="${name}" loading="lazy" onerror="this.remove()">`:''}</div>`;
+  const st=delay?` style="animation-delay:${delay}ms"`:"";
+  return `<div class="cardcell ${cls||''}"${st}>${cardSVG(name)}${url?`<img class="cardcell-img" src="${url}" alt="${name}" loading="lazy" onerror="this.remove()">`:''}</div>`;
 }
 
 /* ---------- spreads ---------- */
@@ -628,7 +639,7 @@ const SPREADS=[
   ]}
 ];
 
-const ROSETTE=`<svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="13" stroke="#D8A94E" stroke-width="1.1"/><circle cx="20" cy="20" r="8" stroke="#D8A94E" stroke-width="1"/><g stroke="#D8A94E" stroke-width="1">${Array.from({length:8}).map((_,i)=>{const a=i*Math.PI/4;const x1=20+Math.cos(a)*8,y1=20+Math.sin(a)*8,x2=20+Math.cos(a)*13,y2=20+Math.sin(a)*13;return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"/>`}).join("")}</g><circle cx="20" cy="20" r="3" fill="#E4C878"/></svg>`;
+const ROSETTE=`<svg viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"><defs><mask id="bkmoon"><rect width="100" height="150" fill="#000"/><circle cx="50" cy="70" r="16" fill="#fff"/><circle cx="56.5" cy="65" r="13.5" fill="#000"/></mask></defs><rect x="7" y="7" width="86" height="136" rx="9" fill="none" stroke="#E6C97A" stroke-width="1" opacity="0.5"/><rect x="11" y="11" width="78" height="128" rx="6" fill="none" stroke="#E6C97A" stroke-width="0.5" opacity="0.3"/><circle cx="50" cy="70" r="16" fill="#EAD08A" mask="url(#bkmoon)"/><g fill="#EAD08A"><path d="M30,44 C30,47.5 27,50.5 23.5,50.5 C27,50.5 30,53.5 30,57 C30,53.5 33,50.5 36.5,50.5 C33,50.5 30,47.5 30,44 Z" opacity="0.9"/><path d="M71,50 C71,53 68.5,55.5 65.5,55.5 C68.5,55.5 71,58 71,61 C71,58 73.5,55.5 76.5,55.5 C73.5,55.5 71,53 71,50 Z" opacity="0.85"/><path d="M50,100 C50,103 47.5,105.5 44.5,105.5 C47.5,105.5 50,108 50,111 C50,108 52.5,105.5 55.5,105.5 C52.5,105.5 50,103 50,100 Z" opacity="0.8"/><circle cx="38" cy="92" r="1.4" opacity="0.7"/><circle cx="64" cy="94" r="1.4" opacity="0.7"/><circle cx="50" cy="33" r="1.5" opacity="0.7"/></g></svg>`;
 
 /* ---------- state ---------- */
 /* ---------- оффлайн-база значений (по Уэйту, своими словами) ---------- */
@@ -719,7 +730,7 @@ const MEANINGS={
    например: "https://tarot-proxy.твойлогин.workers.dev" */
 const PROXY_URL="https://tarot-proxy.mcresearchuz.workers.dev";
 
-let state={mode:"learn",spreadId:"partner",draws:{},question:"",context:"Отношения",busy:false,reading:null,error:null,history:[],clientName:"",readerName:"",source:"ai",notice:"",manual:false};
+let state={mode:"learn",spreadId:"partner",draws:{},question:"",context:"Отношения",busy:false,reading:null,error:null,history:[],clientName:"",readerName:"",source:"ai",notice:"",manual:false,flip:null};
 
 /* ---------- render ---------- */
 function spread(){return SPREADS.find(s=>s.id===state.spreadId)}
@@ -753,20 +764,22 @@ function boardHeight(s){
 function renderBoard(){
   const s=spread();
   const clickable=state.mode==="read";
-  const slots=s.slots.map(sl=>{
+  const firstEmpty=(s.slots.find(sl=>!(state.draws[sl.id]&&state.draws[sl.id].card))||{}).id;
+  const slots=s.slots.map((sl,i)=>{
     const d=state.draws[sl.id];
-    const badgeColor=d?'':'';
     let inner;
     if(d&&d.card){
+      const flip=(state.flip==="all"||state.flip===sl.id)?"flip":"";
+      const delay=state.flip==="all"?i*55:0;
       inner=`<div class="card-face" style="padding:0;overflow:hidden;${d.reversed?'transform:rotate(180deg)':''}">
         <div class="pos-badge" style="${d.reversed?'transform:rotate(180deg)':''}">${sl.label}</div>
-        ${cardCell(d.card,240)}
+        ${cardCell(d.card,240,flip,delay)}
         <span class="cf-name" style="position:absolute;bottom:2px;left:2px;right:2px;background:rgba(247,241,226,.85);border-radius:2px;font-size:9px;padding:1px 2px">${d.card}</span>
       </div>`;
     }else{
-      inner=`<div class="card-back">${ROSETTE}<div class="pos-badge">${sl.label}</div></div>`;
+      const isNext=sl.id===firstEmpty;
+      inner=`<div class="card-empty ${isNext?'next':''}"><div class="pos-badge">${sl.label}</div></div>`;
     }
-    const rot=sl.cross?'rotate(90deg)':'';
     return `<div class="slot ${sl.sig?'sig':''} ${clickable?'clickable':''}"
        style="left:${sl.x}%;top:${sl.y}%;${sl.cross?'transform:translate(-50%,-50%) rotate(90deg);z-index:2':''}"
        ${clickable?`onclick="focusSlot('${sl.id}')"`:''} title="${sl.title}">
@@ -928,12 +941,12 @@ function drawOne(id){
   const pool=DECK.filter(c=>!used.includes(c));
   const card=pool[Math.floor(Math.random()*pool.length)]||DECK[Math.floor(Math.random()*DECK.length)];
   state.draws[id]={card,reversed:Math.random()<0.3};
-  renderStage();
+  state.flip=id;renderStage();state.flip=null;
 }
 function drawAll(){
   const shuffled=[...DECK].sort(()=>Math.random()-0.5);
   spread().slots.forEach((sl,i)=>{state.draws[sl.id]={card:shuffled[i],reversed:Math.random()<0.3}});
-  state.reading=null;state.error=null;renderStage();
+  state.reading=null;state.error=null;state.flip="all";renderStage();state.flip=null;
 }
 function clearDraws(){state.draws={};state.reading=null;state.error=null;renderStage()}
 function allFilled(){return spread().slots.every(sl=>state.draws[sl.id]&&state.draws[sl.id].card)}
@@ -1257,6 +1270,7 @@ function reopenSheet(){
 
 /* ---------- init ---------- */
 document.getElementById("deck").innerHTML=DECK.map(c=>`<option value="${c}">`).join("");
+(function(){const hf=document.getElementById("heroFan");if(hf){const rots=[-34,-22,-11,0,11,22,34];hf.innerHTML=rots.map((r,i)=>`<div class="fcard" style="transform:translateX(${(i-3)*30}px) rotate(${r}deg);z-index:${10-Math.abs(i-3)}">${ROSETTE}</div>`).join("");}})();
 restore();
 renderAll();
 </script>
