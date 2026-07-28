@@ -210,6 +210,19 @@ body::after{
 .hero-fan{position:relative;height:90px;margin-top:54px;display:flex;justify-content:center;align-items:flex-end}
 .hero-fan .fcard{position:absolute;bottom:-34px;width:74px;height:116px;border-radius:13px;overflow:hidden;background:linear-gradient(155deg,#7A66A0,#3E3060);border:1px solid rgba(230,201,122,.4);box-shadow:0 14px 32px rgba(110,90,138,.35);transform-origin:bottom center}
 .hero-fan .fcard svg{width:100%;height:100%;display:block}
+.day-card{display:flex;gap:18px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:16px 18px;box-shadow:0 8px 24px var(--shadow);margin-bottom:26px}
+.day-card .dc-thumb{width:84px;flex:none;border-radius:12px;overflow:hidden;border:1px solid var(--line);line-height:0;aspect-ratio:5/8}
+.day-card .dc-body{flex:1;min-width:0}
+.day-card .dc-eyebrow{font-size:10.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--coral);margin-bottom:4px}
+.day-card .dc-name{font-family:var(--disp);font-size:22px;color:var(--plum);margin-bottom:6px}
+.day-card .dc-text{font-size:13.5px;line-height:1.55;color:var(--ink-soft)}
+.aff-card{position:relative;overflow:hidden;border-radius:28px;padding:64px 34px;text-align:center;color:#fff;margin-bottom:30px;background:linear-gradient(160deg,#8E79B0 0%,#6E5A8A 48%,#4C3D6E 100%);box-shadow:0 22px 52px rgba(110,90,138,.38)}
+.aff-card .aff-sky{position:absolute;inset:0;z-index:0;opacity:.9;pointer-events:none}
+.aff-card .aff-sky svg{width:100%;height:100%}
+.aff-card .aff-inner{position:relative;z-index:1}
+.aff-eyebrow{font-size:11px;letter-spacing:3.5px;text-transform:uppercase;color:#EAD08A;margin-bottom:22px}
+.aff-text{font-family:var(--disp);font-size:clamp(26px,4.2vw,40px);line-height:1.25;max-width:20ch;margin:0 auto}
+@media(max-width:520px){.aff-card{padding:48px 22px} .day-card .dc-thumb{width:70px}}
 .card-face .cf-rev{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-top:4px}
 .card-face.reversed{background:#F3ECDF}
 .card-face .pos-badge{
@@ -409,6 +422,7 @@ body::after{
   <div class="modes">
     <button id="mode-learn" class="on" onclick="setMode('learn')">Изучить</button>
     <button id="mode-read" onclick="setMode('read')">Сделать расклад</button>
+    <button id="mode-aff" onclick="setMode('aff')">Аффирмации</button>
     <button id="mode-cabinet" onclick="setMode('cabinet')">Кабинет</button>
   </div>
 </header>
@@ -724,6 +738,38 @@ const MEANINGS={
 "Король Пентаклей":{up:"Стабильность и надёжная опора: ты твёрдо стоишь на ногах, умеешь приумножать. Карта про достаток, деловую хватку, щедрую силу того, кто состоялся. На тебя можно опереться. Совет: распоряжайся ресурсами мудро и делись, изобилие любит движение.",rev:"Жадность и упрямство: сила уходит в контроль денег и статуса. Либо цепляешься за материальное, либо давишь весом. Опора становится тяжёлой. Совет: не меряй всё деньгами и статусом, есть вещи важнее счёта."}
 };
 
+/* ---------- аффирмации и карта дня ---------- */
+const AFFIRMATIONS=[
+"Я справляюсь, даже когда сомневаюсь.",
+"Мои чувства важны, и я имею право их выражать.",
+"Я иду шаг за шагом, и этого достаточно.",
+"Я доверяю себе и своим решениям.",
+"Тревога это не факт, а всего лишь мысль.",
+"Я в безопасности здесь и сейчас.",
+"Я достаточно хороша такой, какая есть.",
+"Я разрешаю себе ошибаться и учиться.",
+"Моя ценность не зависит от чужого одобрения.",
+"Я выбираю спокойствие вместо спешки.",
+"Я сильнее своих страхов.",
+"Я заслуживаю тепла и заботы, в том числе от себя.",
+"Я отпускаю то, что не могу контролировать.",
+"Каждый вдох возвращает меня к опоре.",
+"Я расту, даже когда мне трудно.",
+"Я имею право занимать своё место.",
+"Мой голос имеет значение.",
+"Я справлялась раньше, справлюсь и теперь.",
+"Я разрешаю себе отдыхать без вины.",
+"Сегодня я выбираю верить в себя.",
+"Я двигаюсь в своём темпе, и это нормально.",
+"Я держусь за то, что даёт мне силу.",
+"Спокойствие уже есть внутри меня.",
+"Я достойна хорошего, и я это принимаю."
+];
+function dayIndex(){const n=new Date();const start=new Date(n.getFullYear(),0,0);return Math.floor((n-start)/86400000);}
+function affirmationOfDay(){return AFFIRMATIONS[dayIndex()%AFFIRMATIONS.length];}
+function cardOfDay(){return DECK[dayIndex()%DECK.length];}
+const SKY_SVG=`<svg viewBox="0 0 600 260" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><defs><mask id="asm"><rect width="600" height="260" fill="#000"/><circle cx="512" cy="60" r="30" fill="#fff"/><circle cx="524" cy="52" r="26" fill="#000"/></mask><radialGradient id="ag"><stop offset="0%" stop-color="#EAD08A" stop-opacity="0.35"/><stop offset="100%" stop-color="#EAD08A" stop-opacity="0"/></radialGradient></defs><circle cx="512" cy="60" r="80" fill="url(#ag)"/><circle cx="512" cy="60" r="30" fill="#EAD08A" mask="url(#asm)" opacity="0.9"/><g fill="#EAD08A" opacity="0.85"><path d="M70,50 C70,56 65,61 59,61 C65,61 70,66 70,72 C70,66 75,61 81,61 C75,61 70,56 70,50 Z"/><path d="M150,150 C150,155 146,159 141,159 C146,159 150,163 150,168 C150,163 154,159 159,159 C154,159 150,155 150,150 Z"/><path d="M560,180 C560,184 557,187 553,187 C557,187 560,190 560,194 C560,190 563,187 567,187 C563,187 560,184 560,180 Z"/><circle cx="110" cy="110" r="2" opacity="0.7"/><circle cx="60" cy="190" r="2" opacity="0.6"/><circle cx="430" cy="40" r="2" opacity="0.7"/></g></svg>`;
+
 /* ---------- state ---------- */
 /* Адрес прокси для толкования на своём сайте.
    Внутри Claude оставь пустым. На своём хостинге впиши адрес Cloudflare Worker,
@@ -848,11 +894,40 @@ function renderReadingOut(){
   return `<div class="reading">${notice}${blocks}${summary}${save}</div>`;
 }
 
+function renderDayCard(){
+  const card=cardOfDay();
+  const m=MEANINGS[card];
+  const text=m?m.up:"";
+  return `<div class="day-card">
+    <div class="dc-thumb">${cardCell(card,240)}</div>
+    <div class="dc-body">
+      <div class="dc-eyebrow">Карта дня</div>
+      <div class="dc-name">${card}</div>
+      <div class="dc-text">${text}</div>
+    </div>
+  </div>`;
+}
+function renderAffirmations(){
+  const aff=affirmationOfDay();
+  return `
+    <h2>Аффирмации</h2>
+    <p class="lede">Короткая опора на каждый день: мысль, которая укрепляет, и карта дня как подсказка.</p>
+    <div class="aff-card">
+      <div class="aff-sky" aria-hidden="true">${SKY_SVG}</div>
+      <div class="aff-inner">
+        <div class="aff-eyebrow">Сегодня</div>
+        <div class="aff-text">${aff}</div>
+      </div>
+    </div>
+    <div class="section-label">Подсказка дня</div>
+    ${renderDayCard()}`;
+}
 function renderStage(){
   const s=spread();
   const st=document.getElementById("stage");
   if(state.mode==="learn"){
     st.innerHTML=`
+      ${renderDayCard()}
       <h2>${s.name}</h2>
       <p class="lede">${s.tagline}</p>
       <div class="when"><b>Когда брать.</b> ${s.when}</div>
@@ -860,6 +935,8 @@ function renderStage(){
       ${renderBoard()}
       <div class="section-label">Значение позиций</div>
       ${renderLegend()}`;
+  }else if(state.mode==="aff"){
+    st.innerHTML=renderAffirmations();
   }else if(state.mode==="cabinet"){
     st.innerHTML=renderCabinet();
   }else{
@@ -906,6 +983,8 @@ function renderFoot(){
     f.innerHTML=`Толкование по системе Райдер-Уэйт-Смит.`;
   }else if(state.mode==="cabinet"){
     f.innerHTML=`История сохраняется прямо в этом браузере на твоём устройстве и остаётся после перезагрузки. Другие устройства и режим инкогнито её не видят. Чтобы удалить запись, нажми «Удалить».`;
+  }else if(state.mode==="aff"){
+    f.innerHTML=`Аффирмация и карта дня обновляются каждый день. Это опора для размышления, а не медицинский совет.`;
   }else{
     f.innerHTML=`Шесть раскладов. Переключись в «Сделать расклад», чтобы вытянуть карты и получить разбор от ИИ.`;
   }
@@ -918,6 +997,7 @@ function setMode(m){
   state.mode=m;
   document.getElementById("mode-learn").classList.toggle("on",m==="learn");
   document.getElementById("mode-read").classList.toggle("on",m==="read");
+  document.getElementById("mode-aff").classList.toggle("on",m==="aff");
   document.getElementById("mode-cabinet").classList.toggle("on",m==="cabinet");
   const hero=document.getElementById("hero");
   if(hero)hero.style.display=m==="learn"?"":"none";
