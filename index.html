@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ключ к Таро · библиотека раскладов</title>
+<title>Ключ к знанию · библиотека раскладов</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap&subset=cyrillic,latin" rel="stylesheet">
@@ -59,7 +59,7 @@ input,select,textarea{font-family:var(--body)}
   display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
   background:var(--panel);
 }
-.brand{display:flex;align-items:center;gap:14px}
+.brand{display:flex;align-items:center;gap:14px;cursor:pointer;user-select:none}
 .mark{width:40px;height:40px;flex:none}
 .brand h1{
   font-family:var(--disp);font-weight:600;font-style:italic;
@@ -127,10 +127,32 @@ body::after{
 .hero-point .hp-t{font-family:var(--disp);font-size:20px;margin-bottom:7px;color:var(--plum)}
 .hero-point .hp-d{font-size:13.5px;line-height:1.55;color:var(--ink-soft)}
 
-.wrap{display:grid;grid-template-columns:280px 1fr;gap:0;min-height:calc(100vh - 84px)}
+.wrap{display:block;min-height:calc(100vh - 84px)}
+
+/* ---- drawer (выезжающее меню раскладов) ---- */
+.drawer{position:fixed;top:0;left:0;height:100vh;width:320px;max-width:86vw;background:var(--panel);border-right:1px solid var(--line);transform:translateX(-102%);transition:transform .28s ease;z-index:80;overflow-y:auto;box-shadow:0 20px 60px rgba(30,25,40,.22)}
+.drawer.open{transform:translateX(0)}
+.drawer-inner{padding:18px 14px 40px}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:6px 8px 14px}
+.drawer-close{border:1px solid var(--line);background:var(--panel);border-radius:999px;width:32px;height:32px;color:var(--ink-soft);cursor:pointer;font-size:13px}
+.drawer-close:hover{border-color:var(--lavender);color:var(--ink)}
+.drawer-bg{position:fixed;inset:0;background:rgba(30,25,40,.34);opacity:0;visibility:hidden;transition:opacity .28s,visibility .28s;z-index:79}
+.drawer-bg.open{opacity:1;visibility:visible}
+.menu-btn{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:11px 20px;font-size:14px;color:var(--ink);cursor:pointer;box-shadow:0 6px 16px var(--shadow);margin-bottom:20px;transition:border-color .15s,transform .12s,box-shadow .15s}
+.menu-btn:hover{border-color:var(--lavender);transform:translateY(-1px);box-shadow:0 10px 22px var(--shadow)}
+.menu-btn .mb-icon{font-size:15px;color:var(--plum)}
+.menu-btn .mb-sub{color:var(--ink-soft);font-size:12.5px}
+
+/* ---- home sections ---- */
+.home-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.home-card{text-align:left;border:1px solid var(--line);background:var(--panel);border-radius:22px;padding:26px 24px;cursor:pointer;box-shadow:0 8px 24px var(--shadow);transition:transform .14s,box-shadow .15s,border-color .15s;display:flex;flex-direction:column;gap:8px}
+.home-card:hover{transform:translateY(-3px);box-shadow:0 16px 34px var(--shadow);border-color:var(--lavender)}
+.home-card .hc-t{font-family:var(--disp);font-size:25px;color:var(--plum)}
+.home-card .hc-d{font-size:13.5px;line-height:1.55;color:var(--ink-soft);flex:1}
+.home-card .hc-go{font-size:12.5px;letter-spacing:.5px;color:var(--coral);margin-top:4px}
 
 /* ---- rail ---- */
-.rail{border-right:1px solid var(--line);padding:16px 14px;background:linear-gradient(180deg,rgba(242,236,220,.5),transparent 240px)}
+.rail{padding:0}
 .rail .eyebrow{font-size:10.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ink-soft);padding:4px 8px 12px}
 .spread-item{
   width:100%;text-align:left;border:1px solid transparent;background:transparent;
@@ -373,10 +395,6 @@ body::after{
 }
 
 @media(max-width:820px){
-  .wrap{grid-template-columns:1fr}
-  .rail{border-right:0;border-bottom:1px solid var(--line);display:flex;gap:8px;overflow-x:auto;padding:12px}
-  .rail .eyebrow{display:none}
-  .spread-item{min-width:180px;margin:0}
   .stage{padding:20px 16px 50px}
   .stage h2{font-size:28px}
   .legend{grid-template-columns:1fr}
@@ -407,7 +425,7 @@ body::after{
 <body>
 
 <header class="masthead">
-  <div class="brand">
+  <div class="brand" onclick="setMode('home')" title="На главную">
     <svg class="mark" viewBox="0 0 40 40" fill="none">
       <rect x="1" y="1" width="38" height="38" rx="9" stroke="#D8A94E" stroke-width="1.5"/>
       <circle cx="20" cy="20" r="9" stroke="#6E5A8A" stroke-width="1.3"/>
@@ -415,12 +433,12 @@ body::after{
       <path d="M20 4 L20 11 M20 29 L20 36 M4 20 L11 20 M29 20 L36 20" stroke="#C06A50" stroke-width="1.3"/>
     </svg>
     <div>
-      <h1>Ключ к Таро</h1>
+      <h1>Ключ к знанию</h1>
       <div class="sub">библиотека раскладов · толкование по уэйту</div>
     </div>
   </div>
   <div class="modes">
-    <button id="mode-learn" class="on" onclick="setMode('learn')">Изучить</button>
+    <button id="mode-learn" class="on" onclick="setMode('learn')">Расклады</button>
     <button id="mode-read" onclick="setMode('read')">Сделать расклад</button>
     <button id="mode-aff" onclick="setMode('aff')">Аффирмации</button>
     <button id="mode-cabinet" onclick="setMode('cabinet')">Кабинет</button>
@@ -468,11 +486,16 @@ body::after{
 </section>
 
 <div class="wrap">
-  <nav class="rail" id="rail">
-    <div class="eyebrow">Расклады</div>
-  </nav>
   <main class="stage" id="stage"></main>
 </div>
+
+<aside class="drawer" id="drawer" aria-label="Список раскладов">
+  <div class="drawer-inner">
+    <div class="drawer-head"><span class="eyebrow">Расклады</span><button class="drawer-close" onclick="closeDrawer()" aria-label="Закрыть">✕</button></div>
+    <div id="rail"></div>
+  </div>
+</aside>
+<div class="drawer-bg" id="drawerBg" onclick="closeDrawer()"></div>
 
 <div class="foot" id="foot"></div>
 
@@ -776,14 +799,15 @@ const SKY_SVG=`<svg viewBox="0 0 600 260" preserveAspectRatio="xMidYMid slice" x
    например: "https://tarot-proxy.твойлогин.workers.dev" */
 const PROXY_URL="https://tarot-proxy.mcresearchuz.workers.dev";
 
-let state={mode:"learn",spreadId:"partner",draws:{},question:"",context:"Отношения",busy:false,reading:null,error:null,history:[],clientName:"",readerName:"",source:"ai",notice:"",manual:false,flip:null};
+let state={mode:"home",spreadId:"partner",draws:{},question:"",context:"Отношения",busy:false,reading:null,error:null,history:[],clientName:"",readerName:"",source:"ai",notice:"",manual:false,flip:null};
 
 /* ---------- render ---------- */
 function spread(){return SPREADS.find(s=>s.id===state.spreadId)}
 
 function renderRail(){
   const r=document.getElementById("rail");
-  r.innerHTML='<div class="eyebrow">Расклады</div>'+SPREADS.map(s=>`
+  if(!r)return;
+  r.innerHTML=SPREADS.map(s=>`
     <button class="spread-item ${s.id===state.spreadId?'on':''}" onclick="pickSpread('${s.id}')">
       <div class="nm">${s.name}</div>
       <div class="mt">${s.tagline}</div>
@@ -925,8 +949,30 @@ function renderAffirmations(){
 function renderStage(){
   const s=spread();
   const st=document.getElementById("stage");
-  if(state.mode==="learn"){
+  if(state.mode==="home"){
     st.innerHTML=`
+      ${renderDayCard()}
+      <div class="section-label">Разделы</div>
+      <div class="home-cards">
+        <button class="home-card" onclick="setMode('learn')">
+          <div class="hc-t">Расклады</div>
+          <div class="hc-d">Шесть раскладов со схемами и значением каждой позиции. Разберись, какой подходит под твой вопрос.</div>
+          <div class="hc-go">Открыть →</div>
+        </button>
+        <button class="home-card" onclick="setMode('read')">
+          <div class="hc-t">Сделать расклад</div>
+          <div class="hc-d">Задай вопрос, вытяни карты и получи разбор от AI-таролога или из справочника.</div>
+          <div class="hc-go">Открыть →</div>
+        </button>
+        <button class="home-card" onclick="setMode('aff')">
+          <div class="hc-t">Аффирмации</div>
+          <div class="hc-d">Аффирмация дня и карта дня как подсказка. Короткая опора и уверенность на каждый день.</div>
+          <div class="hc-go">Открыть →</div>
+        </button>
+      </div>`;
+  }else if(state.mode==="learn"){
+    st.innerHTML=`
+      <button class="menu-btn" onclick="toggleDrawer()"><span class="mb-icon">☰</span> Все расклады <span class="mb-sub">· сейчас: ${s.name}</span></button>
       ${renderDayCard()}
       <h2>${s.name}</h2>
       <p class="lede">${s.tagline}</p>
@@ -941,6 +987,7 @@ function renderStage(){
     st.innerHTML=renderCabinet();
   }else{
     st.innerHTML=`
+      <button class="menu-btn" onclick="toggleDrawer()"><span class="mb-icon">☰</span> Сменить расклад <span class="mb-sub">· ${s.name}</span></button>
       <h2>${s.name}</h2>
       <p class="lede">Начни с вопроса и сферы, затем впиши свои карты или вытяни случайные и получи толкование.</p>
       <div class="ask">
@@ -979,7 +1026,9 @@ function renderStage(){
 
 function renderFoot(){
   const f=document.getElementById("foot");
-  if(state.mode==="read"){
+  if(state.mode==="home"){
+    f.innerHTML=`Таро как система для размышления. Выбери раздел выше, чтобы начать.`;
+  }else if(state.mode==="read"){
     f.innerHTML=`Толкование по системе Райдер-Уэйт-Смит.`;
   }else if(state.mode==="cabinet"){
     f.innerHTML=`История сохраняется прямо в этом браузере на твоём устройстве и остаётся после перезагрузки. Другие устройства и режим инкогнито её не видят. Чтобы удалить запись, нажми «Удалить».`;
@@ -990,7 +1039,13 @@ function renderFoot(){
   }
 }
 
-function renderAll(){renderRail();renderStage();renderFoot()}
+function syncChrome(){
+  const m=state.mode;
+  ["learn","read","aff","cabinet"].forEach(k=>{const b=document.getElementById("mode-"+k);if(b)b.classList.toggle("on",m===k);});
+  const hero=document.getElementById("hero");
+  if(hero)hero.style.display=m==="home"?"":"none";
+}
+function renderAll(){renderRail();syncChrome();renderStage();renderFoot()}
 
 /* ---------- actions ---------- */
 function setMode(m){
@@ -1000,12 +1055,24 @@ function setMode(m){
   document.getElementById("mode-aff").classList.toggle("on",m==="aff");
   document.getElementById("mode-cabinet").classList.toggle("on",m==="cabinet");
   const hero=document.getElementById("hero");
-  if(hero)hero.style.display=m==="learn"?"":"none";
+  if(hero)hero.style.display=m==="home"?"":"none";
+  closeDrawer();
   renderStage();renderFoot();
   window.scrollTo({top:0,behavior:"smooth"});
 }
+function toggleDrawer(){
+  const d=document.getElementById("drawer"),b=document.getElementById("drawerBg");
+  const open=!d.classList.contains("open");
+  d.classList.toggle("open",open);b.classList.toggle("open",open);
+}
+function closeDrawer(){
+  const d=document.getElementById("drawer"),b=document.getElementById("drawerBg");
+  if(d)d.classList.remove("open");if(b)b.classList.remove("open");
+}
 function pickSpread(id){
-  state.spreadId=id;state.draws={};state.reading=null;state.error=null;
+  state.spreadId=id;state.draws={};state.reading=null;state.error=null;state.notice="";
+  closeDrawer();
+  if(state.mode!=="learn"&&state.mode!=="read")state.mode="learn";
   renderAll();
 }
 function setCard(id,v){state.draws[id]={...(state.draws[id]||{reversed:false}),card:v.trim()};updateReadBtn();refreshBoard()}
